@@ -1,7 +1,7 @@
 plugins {
-    kotlin("jvm") version "1.4.0"
+    kotlin("jvm") version "1.3.72" // Needed because that's what gradle uses?
     `java-gradle-plugin`
-    maven
+    `maven-publish`
 }
 
 group = "il.ac.technion.cs"
@@ -35,7 +35,7 @@ configurations.all {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    // implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     implementation("com.github.chaosite", "reactivize-core", "master-SNAPSHOT").apply {
         isChanging = true
