@@ -41,6 +41,11 @@ dependencies {
         isChanging = true
     }
     implementation("org.soot-oss", "soot", "4.2.1")
+
+    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.7.0")
+    testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.7.0")
+
+    testImplementation("org.jetbrains.kotlin", "kotlin-gradle-plugin", "1.3.72")
 }
 
 tasks {
@@ -50,4 +55,8 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
 }

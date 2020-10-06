@@ -3,7 +3,7 @@ package il.ac.technion.cs.reactivize.gradle
 import il.ac.technion.cs.reactivize.ReactivizeCompileSpec
 import il.ac.technion.cs.reactivize.ReactivizePostCompiler
 import org.gradle.api.Action
-import org.gradle.api.DomainObjectSet
+import org.gradle.api.Describable
 import org.gradle.api.Task
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
@@ -11,9 +11,11 @@ import org.gradle.api.tasks.compile.AbstractCompile
 import java.io.File
 import javax.inject.Inject
 
-open class ReactivizeAction @Inject constructor(objectFactory: ObjectFactory) : Action<Task> {
+open class ReactivizeAction @Inject constructor(
+    objectFactory: ObjectFactory,
+    val configuration: ReactivizeGradlePluginConfiguration
+) : Action<Task>, Describable {
     val inpath: ConfigurableFileCollection = objectFactory.fileCollection()
-    val classNames: DomainObjectSet<String> = objectFactory.domainObjectSet(String::class.java)
 
     override fun execute(t: Task) {
         if (!t.didWork)
@@ -49,7 +51,8 @@ open class ReactivizeAction @Inject constructor(objectFactory: ObjectFactory) : 
         compileClasspath = compile.classpath.filter { it.exists() }.files,
         inpath = inpath,
         applicationClassNames = makeClassnames(compile),
-        applicationClassPackagePrefixes = listOf() // TODO: Add config to populate this
+        applicationClassPackagePrefixes = configuration.packagePrefixes
     )
 
+    override fun getDisplayName(): String = "reactivize"
 }

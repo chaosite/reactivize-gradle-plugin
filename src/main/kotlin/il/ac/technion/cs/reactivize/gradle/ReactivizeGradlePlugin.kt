@@ -6,21 +6,27 @@ import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.compile.AbstractCompile
 
-class ReactivizeGradlePlugin : Plugin<Project> {
-    lateinit var project: Project
+open class ReactivizeGradlePluginConfiguration(var packagePrefixes: List<String> = listOf())
 
+class ReactivizeGradlePlugin : Plugin<Project> {
     override fun apply(p: Project) {
-        project = p
-        p.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.all { configureSourceSet(it) }
+        val extension = p.extensions.create<ReactivizeGradlePluginConfiguration>(
+            "configuration",
+            ReactivizeGradlePluginConfiguration::class.java
+        )
+        p.convention.getPlugin(JavaPluginConvention::class.java).sourceSets.all { configureSourceSet(it, p, extension) }
     }
 
-    private fun configureSourceSet(sourceSet: SourceSet) {
+    private fun configureSourceSet(
+        sourceSet: SourceSet,
+        project: Project,
+        extension: ReactivizeGradlePluginConfiguration
+    ) {
         project.plugins.withId("org.jetbrains.kotlin.jvm") {
             project.tasks.named(sourceSet.getCompileTaskName("kotlin"), AbstractCompile::class.java) { compileKotlin ->
-                val action = project.objects.newInstance(ReactivizeAction::class.java)
+                val action = project.objects.newInstance(ReactivizeAction::class.java, extension)
                 action.addToTask(compileKotlin)
                 action.inpath.from(compileKotlin.destinationDir)
-                println(compileKotlin.source.files)
             }
         }
     }
